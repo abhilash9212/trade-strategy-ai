@@ -39,7 +39,7 @@ jobs:
           fi
 
       - name: Upload alerts artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: rsi-alerts-json
           path: alerts.json
