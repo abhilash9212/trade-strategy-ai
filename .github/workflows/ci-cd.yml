@@ -38,7 +38,7 @@ jobs:
             echo "No changes to alerts.json"
           fi
 
-           - name: Upload alerts artifact
+      - name: Upload alerts artifact
         uses: actions/upload-artifact@v3
         with:
           name: rsi-alerts-json
