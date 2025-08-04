@@ -1,0 +1,46 @@
+name: CI/CD – Build, Generate Alerts & Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - run: pip install -r requirements.txt
+
+      - name: Generate trade alerts
+        run: |
+          python - <<'PYCODE'
+          from strategies.generate_trade_alerts import run_trade_alerts
+          alerts = run_trade_alerts()
+          import json
+          with open('alerts.json','w') as f:
+              json.dump(alerts, f, indent=2)
+          PYCODE
+
+      - name: Commit alerts.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "actions@github.com"
+          git add alerts.json
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: update alerts $(date +'%Y-%m-%d')"
+            git push
+          else
+            echo "No changes to alerts.json"
+          fi
+
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key:    ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name:   ${{ secrets.HEROKU_APP_NAME }}
+          heroku_email:      your-email@example.com
