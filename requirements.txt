@@ -6,3 +6,4 @@ python-ta
 pandas-ta
 tqdm
 ta>=0.10.2
+lxml>=4.9.3
